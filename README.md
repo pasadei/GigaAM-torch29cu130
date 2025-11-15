@@ -49,12 +49,17 @@ This repository includes:
    cd GigaAM
    ```
 
-2. Install the package in editable mode:
+2. Install PyTorch 2.9.0 with CUDA 13.0 support (if it is not already installed):
+   ```bash
+   pip install torch==2.9.0+cu130 torchaudio==2.9.0+cu130 --index-url https://download.pytorch.org/whl/cu130
+   ```
+
+3. Install the package in editable mode:
    ```bash
    pip install -e .
    ```
 
-3. Verify the installation:
+4. Verify the installation:
    ```python
    import gigaam
    model = gigaam.load_model("ctc")
