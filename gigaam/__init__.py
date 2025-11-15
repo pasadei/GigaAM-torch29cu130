@@ -1,19 +1,23 @@
 import logging
 import os
+import typing
 import urllib.request
+from collections import defaultdict
 from typing import Optional, Tuple, Union
 
 import torch
-from omegaconf import DictConfig
+from omegaconf import DictConfig, ListConfig
+from omegaconf.base import ContainerMetadata, Metadata
+from omegaconf.nodes import AnyNode
 from tqdm import tqdm
 
 from .model import GigaAM, GigaAMASR, GigaAMEmo
-from .preprocess import load_audio
-from .utils import format_time
+from .preprocess import load_audio  # noqa: F401
+from .utils import format_time  # noqa: F401
 
 # Default cache directory
 _CACHE_DIR = os.path.expanduser("~/.cache/gigaam")
-# Url with model checkpoints
+# URL with model checkpoints
 _URL_DIR = "https://cdn.chatwm.opensmodel.sberdevices.ru/GigaAM"
 _MODEL_NAMES = [
     "ctc",
@@ -30,7 +34,7 @@ _MODEL_NAMES = [
 
 
 def _download_file(file_url: str, file_path: str) -> str:
-    """Helper to download a file if not already cached."""
+    """Download a file if it's not already cached and return its path."""
     if os.path.exists(file_path):
         return file_path
 
@@ -66,6 +70,7 @@ def _download_model(model_name: str, download_root: str) -> Tuple[str, str]:
         model_name = f"v2_{model_name}"
     if model_name == "emo":
         model_name = f"v1_{model_name}"
+
     model_url = f"{_URL_DIR}/{model_name}.ckpt"
     model_path = os.path.join(download_root, model_name + ".ckpt")
     return model_name, _download_file(model_url, model_path)
@@ -95,11 +100,11 @@ def load_model(
     ----------
     model_name : str
         The name of the model to load.
-    fp16_encoder:
+    fp16_encoder : bool
         Whether to convert encoder weights to FP16 precision.
     use_flash : Optional[bool]
         Whether to use flash_attn if the model allows it (requires the flash_attn library installed).
-        Default to False.
+        Defaults to False.
     device : Optional[Union[str, torch.device]]
         The device to load the model onto. Defaults to "cuda" if available, otherwise "cpu".
     download_root : Optional[str]
@@ -117,7 +122,20 @@ def load_model(
     tokenizer_path = _download_tokenizer(model_name, download_root)
 
     if hasattr(torch.serialization, "add_safe_globals"):
-        torch.serialization.add_safe_globals([DictConfig])
+        torch.serialization.add_safe_globals(
+            [
+                DictConfig,
+                ListConfig,
+                AnyNode,
+                Metadata,
+                ContainerMetadata,
+                typing.Any,
+                dict,
+                list,
+                int,
+                defaultdict,
+            ]
+        )
 
     checkpoint = torch.load(model_path, map_location="cpu")
 
