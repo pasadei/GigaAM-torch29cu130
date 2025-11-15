@@ -4,6 +4,7 @@ import urllib.request
 from typing import Optional, Tuple, Union
 
 import torch
+from omegaconf import DictConfig
 from tqdm import tqdm
 
 from .model import GigaAM, GigaAMASR, GigaAMEmo
@@ -114,6 +115,9 @@ def load_model(
 
     model_name, model_path = _download_model(model_name, download_root)
     tokenizer_path = _download_tokenizer(model_name, download_root)
+
+    if hasattr(torch.serialization, "add_safe_globals"):
+        torch.serialization.add_safe_globals([DictConfig])
 
     checkpoint = torch.load(model_path, map_location="cpu")
 
