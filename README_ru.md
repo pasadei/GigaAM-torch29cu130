@@ -47,12 +47,16 @@ GigaAM (**Giga** **A**coustic **M**odel) - семейство акустичес
    git clone https://github.com/salute-developers/GigaAM.git
    cd GigaAM
    ```
-2. Установка пакета:
+2. Установка PyTorch 2.9.0 с поддержкой CUDA 13.0 (если он ещё не установлен):
+  ```bash
+   pip install torch==2.9.0+cu130 torchaudio==2.9.0+cu130 --index-url https://download.pytorch.org/whl/cu130
+   ```
+3. Установка пакета:
   ```bash
    pip install -e .
    ```
 
-3. Проверка установленного пакета:
+4. Проверка установленного пакета:
   ```python
    import gigaam
    model = gigaam.load_model("ctc")
