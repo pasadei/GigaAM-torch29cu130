@@ -1,9 +1,8 @@
 import logging
 import os
-import typing
 import urllib.request
 from collections import defaultdict
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import torch
 from omegaconf import DictConfig, ListConfig
@@ -129,7 +128,7 @@ def load_model(
                 AnyNode,
                 Metadata,
                 ContainerMetadata,
-                typing.Any,
+                Any,
                 dict,
                 list,
                 int,
